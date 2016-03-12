@@ -12,6 +12,10 @@
   :update update-state
   :draw draw-state
   :features [:keep-on-top]
+
+  ; :renderer :pdf
+  ; :output-file "export.pdf"
+
   ; This sketch uses functional-mode middleware.
   ; Check quil wiki for more info about middlewares and particularly
   ; fun-mode.

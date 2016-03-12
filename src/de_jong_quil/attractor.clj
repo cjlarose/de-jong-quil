@@ -1,32 +1,41 @@
 (ns de-jong-quil.attractor
   (:require [quil.core :as q]))
 
+(def num-frames 10)
+(def num-points (bit-shift-left 1 18))
+
+(defn random-points []
+  (repeatedly (fn [] [(- (rand 4.0) 2.0)
+                      (- (rand 4.0) 2.0)])))
+
+(defn de-jong [a b c d]
+  (fn [[x y]]
+    [(- (Math/sin (* a y)) (Math/cos (* b x)))
+     (- (Math/sin (* c x)) (Math/cos (* d y)))]))
+
 (defn setup []
-  ; Set frame rate to 30 frames per second.
-  (q/frame-rate 30)
-  ; Set color mode to HSB (HSV) instead of default RGB.
+  (q/frame-rate 60)
   (q/color-mode :hsb)
-  ; setup function returns initial state. It contains
-  ; circle color and position.
+  (q/no-stroke)
   {:color 0
-   :angle 0})
+   :points (take num-points (random-points))})
 
 (defn update-state [state]
-  ; Update sketch state by changing circle color and position.
-  {:color (mod (+ (:color state) 0.7) 255)
-   :angle (+ (:angle state) 0.1)})
+  (let [f (de-jong 3.14 3.14 3.14 3.14)]
+    {:color 0
+     :points (map f (:points state))}))
 
 (defn draw-state [state]
+  (if (= (q/frame-count) num-frames)
+    (q/exit))
   ; Clear the sketch by filling it with light-grey color.
   (q/background 240)
-  ; Set circle color.
-  (q/fill (:color state) 255 255)
-  ; Calculate x and y coordinates of the circle.
-  (let [angle (:angle state)
-        x (* 150 (q/cos angle))
-        y (* 150 (q/sin angle))]
-    ; Move origin point to the center of the sketch.
+
+  (let [w-scale (/ (q/width) 4)
+        h-scale (/ (q/height) 4)]
     (q/with-translation [(/ (q/width) 2)
                          (/ (q/height) 2)]
-      ; Draw the circle.
-      (q/ellipse x y 100 100))))
+      (doseq [[idx [x y]] (map-indexed vector (:points state))]
+        ; Set point color.
+        (q/fill (* (/ idx num-points) 20) 255 255 25)
+        (q/ellipse (* x w-scale) (* y h-scale) 1 1)))))
