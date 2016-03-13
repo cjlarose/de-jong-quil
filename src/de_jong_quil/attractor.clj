@@ -1,8 +1,7 @@
 (ns de-jong-quil.attractor
   (:require [quil.core :as q]))
 
-(def num-frames 10)
-(def num-points (bit-shift-left 1 18))
+(def num-points (bit-shift-left 1 20))
 
 (defn random-points []
   (repeatedly (fn [] [(- (rand 4.0) 2.0)
@@ -14,28 +13,27 @@
      (- (Math/sin (* c x)) (Math/cos (* d y)))]))
 
 (defn setup []
-  (q/frame-rate 60)
+  (q/frame-rate 1)
   (q/color-mode :hsb)
-  (q/no-stroke)
-  {:color 0
-   :points (take num-points (random-points))})
-
-(defn update-state [state]
-  (let [f (de-jong 3.14 3.14 3.14 3.14)]
+  ; (q/no-stroke)
+  (let [f (de-jong 3.14 3.14 3.14 3.14)
+        points (map (comp f f f f f) (take num-points (random-points)))]
     {:color 0
-     :points (map f (:points state))}))
+     :points points}))
 
 (defn draw-state [state]
-  (if (= (q/frame-count) num-frames)
-    (q/exit))
   ; Clear the sketch by filling it with light-grey color.
-  (q/background 240)
+  (q/background 255)
+  (q/stroke 0 255 255 60)
+
+  ; (q/camera (/ (q/width) 2) (/ (q/height) 2) 40 (/ (q/width) 2) (/ (q/height) 2) 0 0 1 0)
 
   (let [w-scale (/ (q/width) 4)
         h-scale (/ (q/height) 4)]
     (q/with-translation [(/ (q/width) 2)
                          (/ (q/height) 2)]
+      (q/begin-shape :points)
       (doseq [[idx [x y]] (map-indexed vector (:points state))]
-        ; Set point color.
-        (q/fill (* (/ idx num-points) 20) 255 255 25)
-        (q/ellipse (* x w-scale) (* y h-scale) 1 1)))))
+        (q/vertex (* x w-scale 0.8) (* y h-scale 0.8)))
+      (q/end-shape)))
+  (q/exit))
