@@ -1,7 +1,7 @@
 (ns de-jong-quil.attractor
   (:require [quil.core :as q]))
 
-(def num-points 250)
+(def num-points 10000)
 (def GRID_SIZE 25)
 
 (defn random-points []
@@ -25,7 +25,7 @@
   (q/color-mode :hsb)
   (q/no-stroke)
   (let [f (de-jong 3.14 3.14 3.14 3.14)
-        points (map (comp f f f f f) (take num-points (random-points)))]
+        points (mapv (comp f f f f f) (take num-points (random-points)))]
     {:color 0
      :points points}))
 
