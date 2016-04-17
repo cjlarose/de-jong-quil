@@ -2,7 +2,7 @@
   (:require [quil.core :as q]))
 
 (def num-points 250)
-(def GRID_SIZE 50)
+(def GRID_SIZE 25)
 
 (defn random-points []
   (repeatedly (fn [] [(- (rand 4.0) 2.0)
@@ -39,5 +39,5 @@
     (doseq [col (range GRID_SIZE)
             row (range GRID_SIZE)]
       (let [prob (get probs [col row] 0.0)
-            size (* (Math/pow prob 0.5) 100)]
+            size (* (Math/pow prob 0.5) 250)]
         (q/ellipse (+ (* col dx) (/ dx 2)) (+ (* row dy) (/ dy 2)) size size)))))
